@@ -43,7 +43,7 @@ if "$mathcmd" -run "Print[4711]; Exit" < /dev/null | grep 4711 > /dev/null ; the
     Exit[]
   ' < /dev/null | tail -2 | tr '\r' ' '`
   
-  mmapath=", \"/$PREFIX/$PACKAGE\"""
+  mmapath=", \"/$PREFIX/$PACKAGE\""
 
   test -n "$mmapath" && "$mathcmd" -run "mmapath={0$mmapath}" -run '
     prefdir = ToFileName[$PreferencesDirectory, "Kernel"];
