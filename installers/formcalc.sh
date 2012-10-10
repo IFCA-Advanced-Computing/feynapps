@@ -62,11 +62,11 @@ if "$mathcmd" -run "Print[4711]; Exit" < /dev/null | grep 4711 > /dev/null ; the
 fi
 
 
-echo "export PATH=/usr/local/$PACKAGE/bin:\$PATH" > /etc/profile.d/z$PACKAGE.sh
-echo "export LD_LIBRARY_PATH=/usr/local/$PACKAGE/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$PACKAGE.sh
-echo "setenv PATH /usr/local/$PACKAGE/bin:\${PATH}" > /etc/profile.d/z$PACKAGE.csh
-echo "setenv LD_LIBRARY_PATH /usr/local/$PACKAGE/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$PACKAGE.csh
+echo "export PATH=$PREFIX/$PACKAGE/bin:\$PATH" > /etc/profile.d/z$PACKAGE.sh
+echo "export LD_LIBRARY_PATH=$PREFIX/$PACKAGE/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$PACKAGE.sh
+echo "setenv PATH $PREFIX/$PACKAGE/bin:\${PATH}" > /etc/profile.d/z$PACKAGE.csh
+echo "setenv LD_LIBRARY_PATH $PREFIX/$PACKAGE/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$PACKAGE.csh
 
-echo "* $NAME v $VERSION installed at /usr/local/$PACKAGE" >> /etc/motd
+echo "* $NAME v $VERSION installed at $PREFIX/$PACKAGE" >> /etc/motd
 
 exit 0
