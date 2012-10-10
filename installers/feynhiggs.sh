@@ -10,15 +10,21 @@ BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
-curl "$BASE_URL/$TAR_FILE" | tar -xzf -
+rm -rf /usr/local/$PACKAGE
+curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C /usr/local
 if [ $? -ne 0 ] ; then
-    echo "Unable to download package"
+    echo "Unable to download package and uncompress package"
     exit 1
 fi
 
-cd $PACKAGE
+rm -f /usr/local/$NAME
+ln -s /usr/local/$PACKAGE /usr/local/$NAME
 
-./configure --prefix=/usr/local/$PACKAGE && make && make install
+
+
+
+echo "Configure and make log at $PWD/make.log"
+(./configure --prefix=/usr/local/$PACKAGE && make && make install) 2>&1 > make.log
 if [ $? -ne 0 ] ; then
     echo "Unable to compile package"
     exit 1
