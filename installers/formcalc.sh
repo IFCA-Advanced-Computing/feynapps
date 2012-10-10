@@ -7,7 +7,7 @@ VERSION=$2
 echo "Installing $NAME version $VERSION"
 
 PREFIX=/usr/local
-BASE_URL=http://www.feynarts.de
+BASE_URL=http://www.feynarts.de/formcalc
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
