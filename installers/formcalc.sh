@@ -39,7 +39,8 @@ else
     ln -s $PREFIX/$PACKAGE $PREFIX/$NAME
 fi
 
-./mathpath.sh $NAME $PREFIX/$NAME
+. `dirname $0`/mathpath.sh
+add_math_path $NAME $PREFIX/$NAME
 
 echo "* $NAME v $VERSION installed at $PREFIX/$PACKAGE" >> /etc/motd
 
