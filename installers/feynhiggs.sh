@@ -6,6 +6,8 @@ VERSION=$2
 
 echo "Installing $NAME version $VERSION"
 
+export PATH=/usr/local/bin:$PATH
+
 PREFIX=/usr/local
 BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
 PACKAGE=$NAME-$VERSION
