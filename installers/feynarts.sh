@@ -18,12 +18,12 @@ echo "Configure and make log at $logfile"
 
 make -f - << EOF > $logfile 2>&1
 install:
-        @echo "cleaning up"
-        rm -rf $PREFIX/src/$PACKAGE
-        rm -rf $PREFIX/$PACKAGE
-        @echo "downloading package from $BASE_URL"
-        curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
-        @echo "done."
+	@echo "cleaning up"
+	rm -rf $PREFIX/src/$PACKAGE
+	rm -rf $PREFIX/$PACKAGE
+	@echo "downloading package from $BASE_URL"
+	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
+	@echo "done."
 EOF
 if [ $? -ne 0 ] ; then
     echo "Installation error, check $logfile"
