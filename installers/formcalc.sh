@@ -26,7 +26,7 @@ install:
 	@echo "compiling"
 	cd $PREFIX/$PACKAGE && \\
 	./compile
-@echo "done."
+	@echo "done."
 EOF
 if [ $? -ne 0 ] ; then
     echo "Installation error, check $logfile"
