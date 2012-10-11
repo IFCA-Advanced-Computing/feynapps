@@ -11,29 +11,41 @@ BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
-rm -rf $PREFIX/$PACKAGE
-curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
+mkdir -p $PREFIX/src
+
+logfile=$PREFIX/src/$NAME-$VERSION-make.log
+echo "Configure and make log at $logfile"
+
+make -f - << EOF > $logfile 2>&1
+InstallFeynHiggs:
+	@echo "cleaning up"
+	rm -rf $PREFIX/src/$PACKAGE
+	rm -rf $PREFIX/$PACKAGE
+	@echo "donwloading package from $BASE_URL"
+	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX/src
+	@echo "compiling"
+	cd $PREFIX/src/$PACKAGE && \\
+	./configure --prefix=$PREFIX/$PACKAGE && \\
+	make && \\
+	make install
+	@echo "done."
+EOF
 if [ $? -ne 0 ] ; then
-    echo "Unable to download package and uncompress package"
-    exit 1
+	echo "Installation error, check $logfile"
+	exit 1
 fi
 
-rm -f $PREFIX/$NAME
-ln -s $PREFIX/$PACKAGE $PREFIX/$NAME
-
-cd $PREFIX/$PACKAGE
-
-echo "Configure and make log at $PWD/make.log"
-(./configure --prefix=$PREFIX/$PACKAGE && make && make install) 2>&1 > make.log
-if [ $? -ne 0 ] ; then
-    echo "Unable to compile package"
-    exit 1
+if [ -L $PREFIX/$NAME ] ; then
+	echo "Not changing the current link to $NAME in $PREFIX!"
+else
+	ln -s $PREFIX/$PACKAGE $PREFIX/$NAME
 fi
 
-echo "export PATH=$PREFIX/$PACKAGE/bin:\$PATH" > /etc/profile.d/z$PACKAGE.sh
-echo "export LD_LIBRARY_PATH=$PREFIX/$PACKAGE/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$PACKAGE.sh
-echo "setenv PATH $PREFIX/$PACKAGE/bin:\${PATH}" > /etc/profile.d/z$PACKAGE.csh
-echo "setenv LD_LIBRARY_PATH $PREFIX/$PACKAGE/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$PACKAGE.csh
+
+echo "export PATH=$PREFIX/$NAME/bin:\$PATH" > /etc/profile.d/z$NAME.sh
+echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$NAME.sh
+echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh
+echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh
 
 echo "* $NAME v $VERSION installed at $PREFIX/$PACKAGE" >> /etc/motd
 

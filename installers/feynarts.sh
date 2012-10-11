@@ -7,7 +7,7 @@ VERSION=$2
 echo "Installing $NAME version $VERSION"
 
 PREFIX=/usr/local
-BASE_URL=http://www.feynarts.de/formcalc
+BASE_URL=http://www.feynarts.de
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
@@ -23,9 +23,6 @@ install:
         rm -rf $PREFIX/$PACKAGE
         @echo "downloading package from $BASE_URL"
         curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
-        @echo "compiling"
-        cd $PREFIX/$PACKAGE && \\
-        ./compile
         @echo "done."
 EOF
 if [ $? -ne 0 ] ; then

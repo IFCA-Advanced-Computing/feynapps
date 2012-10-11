@@ -7,7 +7,7 @@ VERSION=$2
 echo "Installing $NAME version $VERSION"
 
 PREFIX=/usr/local
-BASE_URL=http://www.feynarts.de/formcalc
+BASE_URL=http://www.feynarts.de/looptools
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
@@ -24,8 +24,7 @@ install:
         @echo "downloading package from $BASE_URL"
         curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
         @echo "compiling"
-        cd $PREFIX/$PACKAGE && \\
-        ./compile
+        cd $PREFIX/$PACKAGE && ./configure && \$(MAKE) default install clean 
         @echo "done."
 EOF
 if [ $? -ne 0 ] ; then
