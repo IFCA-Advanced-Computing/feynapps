@@ -11,7 +11,12 @@ echo "Installing $NAME version $VERSION"
 
 export PATH=/usr/local/bin:$PATH
 
-BASE_URL=http://www.feynarts.de/looptools
+BASE_URL=http://www.feynarts.de
+if [ $NAME = "LoopTools" ] ; then
+    BASE_URL=$BASE_URL/looptools
+elif [ $NAME = "FormCalc" ] ; then
+    BASE_URL=$BASE_URL/formcalc
+fi
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
@@ -21,7 +26,7 @@ PREFIX=`dirname $DEST_DIR`
 logfile=$SRC_DIR/$NAME-$VERSION-make.log
 echo "Configure and make log at $logfile"
 
-if [ $NAME == "LoopTools" ]; then
+if [ $NAME = "LoopTools" ]; then
     make -f - << EOF > $logfile 2>&1
 install:
 	@echo "cleaning up"
@@ -33,7 +38,7 @@ install:
 	cd $DESTDIR && ./configure && \$(MAKE) default install clean 
 	@echo "done."
 EOF
-elif [ $NAME == "FormCalc" ] ; then
+elif [ $NAME = "FormCalc" ] ; then
     make -f - << EOF > $logfile 2>&1
 install:
 	@echo "cleaning up"
@@ -47,7 +52,7 @@ install:
 	@echo "done."
 EOF
 
-elif [ $NAME == "FeynArts" ] ; then
+elif [ $NAME = "FeynArts" ] ; then
     make -f - << EOF > $logfile 2>&1
 install:
 	@echo "cleaning up"
