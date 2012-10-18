@@ -63,7 +63,7 @@ def execute_install(app, config):
             logging.error('Error executing script, script output:\n%s' % out)
         else:
             logging.debug('Script output:\n%s' % out)
-        return True
+            return True
     except KeyError, e:
         logging.error('Invalid application data %s' % e)
     except IOError, e:
