@@ -35,7 +35,7 @@ install:
 	@echo "downloading package from $BASE_URL"
 	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
 	@echo "compiling"
-	cd $DESTDIR && ./configure && \$(MAKE) default install clean 
+	cd $DEST_DIR && ./configure && \$(MAKE) default install clean 
 	@echo "done."
 EOF
 elif [ $NAME = "FormCalc" ] ; then
