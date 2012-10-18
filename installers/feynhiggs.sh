@@ -1,6 +1,7 @@
 #!/bin/sh
 
 # The scripts receive as input the name and version of the package
+# and the locations to install and source
 NAME=$1
 VERSION=$2
 DEST_DIR=$3
@@ -38,7 +39,7 @@ if [ $? -ne 0 ] ; then
 	exit 1
 fi
 
-PREFIX=`basename $DEST_DIR`
+PREFIX=`dirname $DEST_DIR`
 
 if [ -L $PREFIX/$NAME ] ; then
 	echo "Not changing the current link to $NAME in $PREFIX!"

@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 #
 # modifies mathemathica path to include packages
 #
