@@ -1,0 +1,156 @@
+#
+#
+
+from commands import getstatusoutput
+import logging
+import json
+from optparse import OptionParser
+import os
+import shutil
+import stat
+import sys
+import urllib2
+import urlparse
+
+def get_apps(config):
+    response = urllib2.urlopen(config['server']).read()
+    return json.loads(response)
+
+def get_app_info(app, v, config):
+    l = app['versions'][v]['location']
+    response = urllib2.urlopen(urlparse.urljoin(config['server'], l)).read()
+    return json.loads(response)
+
+def do_list_apps(config):
+    apps = get_apps(config)
+    for a in apps: 
+        print a 
+        for v in apps[a]['versions']:
+            print '%s - %s' % (a, v)
+
+def do_boot(config):
+    # clone git repo
+    #if os.path.exists(config['repo_path']):
+    #    shutil.rmtree(config['repo_path'], ignore_errors=True)
+    #logging.info('Cloning %s into %s' % (config['repo'], config['repo_path']))
+    #st, out = getstatusoutput('git clone %s %s' % (config['repo'], config['repo_path']))
+    #logging.debug('Git output:\n%s' % out)
+    #if st != 0:
+    #    logging.error('Error while cloning repo, exiting')
+    #    sys.exit(1)
+    for app in config['apps']:
+        do_install_app(app, config['apps'][app], config)
+ 
+
+def execute_install(app, config):
+    try:
+        name = app['app_name']
+        version = app['app_version']
+        script = app['app_script']
+        logging.info('Installing %s v%s' % (name, version))
+
+        # just remove whatever there might be
+        app_dir = os.path.join(config['base_path'], '%s-%s' % (name, version))
+        shutil.rmtree(app_dir, ignore_errors=True)
+        os.makedirs(app_dir)
+        script_name = os.path.join(config['repo_path'], script)
+        os.chmod(script_name, stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR)
+
+        logging.info('Executing %s' % script_name)
+        args = '%s %s %s %s' % (name, version, app_dir, os.path.join(config['base_path'], 'src'))
+        logging.info('Arguments: %s' % args)
+        st, out = getstatusoutput('%s %s' % (script_name, args))
+        if st != 0:
+            logging.error('Error executing script, script output:\n%s' % out)
+        else:
+            logging.debug('Script output:\n%s' % out)
+        return True
+    except KeyError, e:
+        logging.error('Invalid application data %s' % e)
+    except IOError, e:
+        logging.error("Error trying to create script %s" % e)
+    return False
+
+def do_install_app(app_name, app_version, config):
+    logging.debug('Searching for %s v%s...' % (app_name, app_version))
+    apps = get_apps(config)
+    if app_name not in apps:
+        logging.error('%s is not available for installing' % app_name)
+        sys.exit(1)
+    if app_version not in apps[app_name]['versions']:
+        logging.error('%s v%s is not available for installing' % (app_name, app_version))
+        sys.exit(1)
+    app = get_app_info(apps[app_name], app_version, config)
+    if 'dependencies' in app:
+        for dep in app['dependencies']:
+            if dep not in apps:
+                logging.warn("Dependency %s not available, ignoring" % dep)
+                continue
+            try:
+                v = config['apps'][dep]
+            except KeyError:
+                logging.info("Dependency %s not configured, searching for version" % dep)
+                k = apps[dep]['versions'].keys()
+                k.sort
+                v = k[-1]
+            logging.info("Installing dependency %s v%s" % (dep, v))
+            do_install_app(dep, v, config)
+    if execute_install(app, config):
+        print "KK"
+        # update 
+
+
+if __name__ == '__main__':
+    # FIXME, use better argument parsing.
+    usage = "usage: %prog [options] command [command option]"
+    parser = OptionParser(usage)
+    parser.add_option('-v', '--verbose', dest='verbose', action='store_true',
+                      help='increase verbosity', default=False)
+    parser.add_option('-c', '--config', dest='conffile', 
+                      help='use FILE as config file', metavar='FILE')
+    (options, args) = parser.parse_args()
+    if len(args) < 1:
+        parser.error("missing command: list, install")
+
+    logging.basicConfig(level=logging.DEBUG,
+                        format='%(asctime)-15s %(levelname)-8s %(message)s')
+
+    config = {}
+    if options.conffile:
+        try:
+            logging.info("Using %s as config file" % options.conffile)
+            config = json.loads(open(options.conffile).read())
+        except:
+            logging.error("%s" % options.conffile)
+            sys.exit(1)
+
+
+    #try:
+    #    boot_config = json.loads(sys.stdin.read())
+    #    config.update(boot_config)
+    #except e:
+    #    print e
+
+    # nice default values
+    config.setdefault('base_path', '/usr/local')
+    config['base_path'] = os.path.abspath(config['base_path'])
+    config.setdefault('etc_path', os.path.join(config['base_path'], 'etc'))
+    config.setdefault('repo_path', os.path.join(config['base_path'], 'src', 'feynapps'))
+    config.setdefault('repo', 'http://github.com/enolfc/feynapps.git')
+    config.setdefault('server', 'http://193.146.75.142/feynapps')
+    config.setdefault('apps', {})
+
+    if (args[0] == 'boot'):
+        if len(args) != 1:
+            parser.error("list command does not take any extra options")
+        do_boot(config)
+    elif (args[0] == 'list'):
+        if len(args) != 1:
+            parser.error("list command does not take any extra options")
+        do_list_apps(config)
+    elif (args[0] == 'install'):
+        if len(args) != 3:
+            parser.error("install command requires app_name and app_version")
+        do_install_app(args[1], args[2], config)
+    else:
+        parser.error("unknown command %s" % args[0])
