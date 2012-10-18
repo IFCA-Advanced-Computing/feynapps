@@ -3,31 +3,32 @@
 # The scripts receive as input the name and version of the package
 NAME=$1
 VERSION=$2
+DEST_DIR=$3
+SRC_DIR=$4
 
 echo "Installing $NAME version $VERSION"
 
 export PATH=/usr/local/bin:$PATH
 
-PREFIX=/usr/local
 BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
 PACKAGE=$NAME-$VERSION
 TAR_FILE=$NAME-$VERSION.tar.gz
 
-mkdir -p $PREFIX/src
+mkdir -p $SRC_DIR
 
-logfile=$PREFIX/src/$NAME-$VERSION-make.log
+logfile=$SRC_DIR/$NAME-$VERSION-make.log
 echo "Configure and make log at $logfile"
 
 make -f - << EOF > $logfile 2>&1
 InstallFeynHiggs:
 	@echo "cleaning up"
-	rm -rf $PREFIX/src/$PACKAGE
-	rm -rf $PREFIX/$PACKAGE
+	rm -rf $SRC_DIR/$PACKAGE
+	rm -rf $DEST_DIR
 	@echo "donwloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX/src
+	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $SRC_DIR
 	@echo "compiling"
-	cd $PREFIX/src/$PACKAGE && \\
-	./configure --prefix=$PREFIX/$PACKAGE && \\
+	cd $SRC_DIR/$PACKAGE && \\
+	./configure --prefix=$DEST_DIR && \\
 	make && \\
 	make install
 	@echo "done."
@@ -37,10 +38,12 @@ if [ $? -ne 0 ] ; then
 	exit 1
 fi
 
+PREFIX=`basename $DEST_DIR`
+
 if [ -L $PREFIX/$NAME ] ; then
 	echo "Not changing the current link to $NAME in $PREFIX!"
 else
-	ln -s $PREFIX/$PACKAGE $PREFIX/$NAME
+	ln -s $DEST_DIR $PREFIX/$NAME
 fi
 
 
@@ -49,6 +52,6 @@ echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/prof
 echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh
 echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh
 
-echo "* $NAME v $VERSION installed at $PREFIX/$PACKAGE" >> /etc/motd
+echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd
 
 exit 0
