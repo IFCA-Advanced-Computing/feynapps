@@ -50,8 +50,6 @@ def execute_install(app, config):
         shutil.rmtree(app_dir, ignore_errors=True)
         os.makedirs(app_dir)
         script_name = os.path.join(config['repo_path'], 'installers', installer)
-        os.chmod(script_name, stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR)
-
         logging.info('Executing %s' % script_name)
         args = '%s %s %s %s' % (name, version, app_dir, os.path.join(config['base_path'], 'src'))
         logging.info('Arguments: %s' % args)
