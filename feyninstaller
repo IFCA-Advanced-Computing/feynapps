@@ -11,14 +11,20 @@ import sys
 import urllib2
 import urlparse
 
-def get_apps(config):
-    response = urllib2.urlopen(config['server']).read()
-    return json.loads(response)
+apps_info = None
 
-def get_app_info(app, v, config):
-    l = app['versions'][v]['location']
-    response = urllib2.urlopen(urlparse.urljoin(config['server'], l)).read()
-    return json.loads(response)
+def get_apps(config):
+    global apps_info
+    if not apps_info:
+        apps_info = json.loads(open(os.path.join(config['repo_path'], 'apps.json')).read())
+    return apps_info
+
+def get_app_info(name, version, config):
+    apps = get_apps(config)
+    info = dict(apps[name].items())
+    del info['versions']
+    info.update(apps[name]['versions'][version])
+    return info 
 
 def do_list_apps(config):
     apps = get_apps(config)
@@ -28,15 +34,6 @@ def do_list_apps(config):
             print '%s - %s' % (a, v)
 
 def do_boot(config):
-    # clone git repo
-    if os.path.exists(config['repo_path']):
-        shutil.rmtree(config['repo_path'], ignore_errors=True)
-    logging.info('Cloning %s into %s' % (config['repo'], config['repo_path']))
-    st, out = getstatusoutput('git clone %s %s' % (config['repo'], config['repo_path']))
-    logging.debug('Git output:\n%s' % out)
-    if st != 0:
-        logging.error('Error while cloning repo, exiting')
-        sys.exit(1)
     for app in config['apps']:
         do_install_app(app, config['apps'][app], config)
  
@@ -45,14 +42,14 @@ def execute_install(app, config):
     try:
         name = app['app_name']
         version = app['app_version']
-        script = app['app_script']
+        installer = app['installer']
         logging.info('Installing %s v%s' % (name, version))
 
         # just remove whatever there might be
         app_dir = os.path.join(config['base_path'], '%s-%s' % (name, version))
         shutil.rmtree(app_dir, ignore_errors=True)
         os.makedirs(app_dir)
-        script_name = os.path.join(config['repo_path'], script)
+        script_name = os.path.join(config['repo_path'], 'installers', installer)
         os.chmod(script_name, stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR)
 
         logging.info('Executing %s' % script_name)
@@ -79,7 +76,7 @@ def do_install_app(app_name, app_version, config):
     if app_version not in apps[app_name]['versions']:
         logging.error('%s v%s is not available for installing' % (app_name, app_version))
         sys.exit(1)
-    app = get_app_info(apps[app_name], app_version, config)
+    app = get_app_info(app_name, app_version, config)
     if 'dependencies' in app:
         for dep in app['dependencies']:
             if dep not in apps:
@@ -108,7 +105,7 @@ if __name__ == '__main__':
                       help='use FILE as config file', metavar='FILE')
     (options, args) = parser.parse_args()
     if len(args) < 1:
-        parser.error("missing command: list, install")
+        parser.error("missing command: boot, list, install")
 
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)-15s %(levelname)-8s %(message)s')
@@ -127,14 +124,15 @@ if __name__ == '__main__':
     config.setdefault('base_path', '/usr/local')
     config['base_path'] = os.path.abspath(config['base_path'])
     config.setdefault('etc_path', os.path.join(config['base_path'], 'etc'))
-    config.setdefault('repo_path', os.path.join(config['base_path'], 'src', 'feynapps'))
     config.setdefault('repo', 'http://github.com/enolfc/feynapps.git')
     config.setdefault('server', 'http://193.146.75.142/feynapps')
     config.setdefault('apps', {})
 
+    config['repo_path'] = os.path.abspath(os.path.dirname(sys.argv[0]))
+
     if (args[0] == 'boot'):
         if len(args) != 1:
-            parser.error("list command does not take any extra options")
+            parser.error("boot command does not take any extra options")
         do_boot(config)
     elif (args[0] == 'list'):
         if len(args) != 1:
