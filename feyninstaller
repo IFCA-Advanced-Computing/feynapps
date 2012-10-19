@@ -77,10 +77,13 @@ def do_install_app(app_name, app_version, config):
         logging.error('%s v%s is not available for installing' % (app_name, app_version))
         sys.exit(1)
     app = get_app_info(app_name, app_version, config)
+    if 'installed' in app and app['installed']:
+        logging.debug("Application is already installed, ignoring.")
+        return
     if 'dependencies' in app:
         for dep in app['dependencies']:
             if dep not in apps:
-                logging.warn("Dependency %s not available, ignoring" % dep)
+                logging.warn("Dependency %s not available, ignoring." % dep)
                 continue
             try:
                 v = config['apps'][dep]
@@ -91,8 +94,10 @@ def do_install_app(app_name, app_version, config):
                 v = k[-1]
             logging.info("Installing dependency %s v%s" % (dep, v))
             do_install_app(dep, v, config)
+    # this should be smarter XXX
     if execute_install(app, config):
-        logging.debug("Missing this!")
+        logging.debug("Set application as installed")
+        apps[app_name]['versions'][app_version]['installed'] = True
 
 
 if __name__ == '__main__':
