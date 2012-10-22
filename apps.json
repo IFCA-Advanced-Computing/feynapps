@@ -58,6 +58,16 @@
                 "app_version": "2.8" 
             }
         }
+    },
+    "Hdecay" {
+        "app_name": "Hdecay", 
+        "dependencies": [], 
+        "installer": "hdecay.sh",
+        "versions": {
+            "current": {
+                "app_version": "current" 
+            }
+        }
     }
 }
 
