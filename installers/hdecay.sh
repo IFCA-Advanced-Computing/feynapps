@@ -14,7 +14,7 @@ export PATH=/usr/local/bin:$PATH
 BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
 BASE_URL=http://people.web.psi.ch/spira/hdecay
 PACKAGE=$NAME
-TAR_FILE=$NAME.tar.gz
+TAR_FILE=hdecay.tar.gz
 
 mkdir -p $SRC_DIR
 
@@ -26,13 +26,12 @@ InstallHdecay:
 	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
-	@echo "donwloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $SRC_DIR
+	mkdir -p $DEST_DIR
+	@echo "downloading package from $BASE_URL"
+	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $DEST_DIR
 	@echo "compiling"
-	cd $SRC_DIR/$PACKAGE && \\
-	./configure --prefix=$DEST_DIR && \\
-	make && \\
-	make install
+	cd $DEST_DIR && \\
+	make FC=gfortran
 	@echo "done."
 EOF
 if [ $? -ne 0 ] ; then
@@ -48,11 +47,12 @@ else
 	ln -s $DEST_DIR $PREFIX/$NAME
 fi
 
+# Not doing anything here...
 
-echo "export PATH=$PREFIX/$NAME/bin:\$PATH" > /etc/profile.d/z$NAME.sh
-echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$NAME.sh
-echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh
-echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh
+#echo "export PATH=$PREFIX/$NAME/bin:\$PATH" > /etc/profile.d/z$NAME.sh
+#echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$NAME.sh
+#echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh
+#echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh
 
 echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd
 
