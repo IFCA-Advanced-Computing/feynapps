@@ -4,21 +4,15 @@
 # and the locations to install and source
 NAME=$1
 VERSION=$2
-DEST_DIR=$3
-SRC_DIR=$4
+TAR_FILE=$3
+DEST_DIR=$4
+SRC_DIR=$5
 
 echo "Installing $NAME version $VERSION"
 
 export PATH=/usr/local/bin:$PATH
 
-BASE_URL=http://www.feynarts.de
-if [ $NAME = "LoopTools" ] ; then
-    BASE_URL=$BASE_URL/looptools
-elif [ $NAME = "FormCalc" ] ; then
-    BASE_URL=$BASE_URL/formcalc
-fi
 PACKAGE=$NAME-$VERSION
-TAR_FILE=$NAME-$VERSION.tar.gz
 
 mkdir -p $SRC_DIR
 PREFIX=`dirname $DEST_DIR`
@@ -32,8 +26,8 @@ install:
 	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
-	@echo "downloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
+	@echo "Unpacking package at $TAR_FILE"
+	tar -xzf $TAR_FILE -C $PREFIX
 	@echo "compiling"
 	cd $DEST_DIR && ./configure && \$(MAKE) default install clean 
 	@echo "done."
@@ -44,8 +38,8 @@ install:
 	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
-	@echo "downloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
+	@echo "Unpacking package at $TAR_FILE"
+	tar -xzf $TAR_FILE -C $PREFIX
 	@echo "compiling"
 	cd $DEST_DIR && \\
 	./compile
@@ -58,8 +52,8 @@ install:
 	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
-	@echo "downloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $PREFIX
+	@echo "Unpacking package at $TAR_FILE"
+	tar -xzf $TAR_FILE -C $PREFIX
 	@echo "done."
 EOF
 fi
@@ -69,16 +63,14 @@ if [ $? -ne 0 ] ; then
     exit 1
 fi
 
-
 if [ -L $PREFIX/$NAME ] ; then
 	echo "Not changing the current link to $NAME in $PREFIX!"
 else
 	ln -s $DEST_DIR $PREFIX/$NAME
 fi
 
+st=0
 . `dirname $0`/mathpath.sh
-add_math_path $NAME $PREFIX/$NAME
-
-echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd
-
-exit 0
+add_math_path $NAME $PREFIX/$NAME || st=1
+echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd || st=1
+exit $st 

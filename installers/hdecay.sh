@@ -4,17 +4,15 @@
 # and the locations to install and source
 NAME=$1
 VERSION=$2
-DEST_DIR=$3
-SRC_DIR=$4
+TAR_FILE=$3
+DEST_DIR=$4
+SRC_DIR=$5
 
 echo "Installing $NAME version $VERSION"
 
 export PATH=/usr/local/bin:$PATH
 
-BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
-BASE_URL=http://people.web.psi.ch/spira/hdecay
 PACKAGE=$NAME
-TAR_FILE=hdecay.tar.gz
 
 mkdir -p $SRC_DIR
 
@@ -27,8 +25,8 @@ InstallHdecay:
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
 	mkdir -p $DEST_DIR
-	@echo "downloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $DEST_DIR
+	@echo "Unpacking package at $TAR_FILE"
+	tar -xzf $TAR_FILE -C $DEST_DIR
 	@echo "compiling"
 	cd $DEST_DIR && \\
 	make FC=gfortran
@@ -47,13 +45,6 @@ else
 	ln -s $DEST_DIR $PREFIX/$NAME
 fi
 
-# Not doing anything here...
-
-#echo "export PATH=$PREFIX/$NAME/bin:\$PATH" > /etc/profile.d/z$NAME.sh
-#echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$NAME.sh
-#echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh
-#echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh
-
-echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd
-
-exit 0
+st=0
+echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd || st=1
+exit $st

@@ -16,9 +16,6 @@ add_math_path () {
   mathcmd=`which math`
 
   if "$mathcmd" -run "Print[4711]; Exit" < /dev/null | grep 4711 > /dev/null ; then
-    if [ "x$path" != "x" ] ; then
-      echo "kk"
-    else
       $mathcmd -run "mmapath={0, \"$LOCATION\"}" -run '
         prefdir = ToFileName[$PreferencesDirectory, "Kernel"];
         If[ FileType[prefdir] === None, CreateDirectory[prefdir] ];
@@ -33,6 +30,5 @@ add_math_path () {
         Print["Modified ", Close[hh]];
         Exit[]
       ' < /dev/null | tail -1
-    fi
   fi
 }

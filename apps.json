@@ -3,6 +3,7 @@
         "app_name": "FeynArts", 
         "dependencies": [], 
         "installer": "feyntools.sh",
+        "base_url": "http://www.feynarts.de/",
         "versions": {
             "3.6": {
                 "app_version": "3.6"
@@ -16,6 +17,7 @@
         "app_name": "FeynHiggs", 
         "dependencies": [], 
         "installer": "feynhiggs.sh",
+        "base_url": "http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion/",
         "versions": {
             "2.6.5": {
                 "app_version": "2.6.5"
@@ -34,10 +36,14 @@
     "FormCalc": {
         "app_name": "FormCalc", 
         "dependencies": [
-            "FeynHiggs"
         ], 
         "installer": "feyntools.sh",
+        "base_url": "http://www.feynarts.de/formcalc/",
         "versions": {
+            "7.0.2": {
+                "base_url": "https://devel.ifca.es/~enol/feynapps/",
+                "app_version": "7.0.2"
+            }, 
             "7.0": {
                 "app_version": "7.0"
             }, 
@@ -50,6 +56,7 @@
         "app_name": "LoopTools", 
         "dependencies": [], 
         "installer": "feyntools.sh",
+        "base_url": "http://www.feynarts.de/looptools/",
         "versions": {
             "2.7": {
                 "app_version": "2.7" 
@@ -62,6 +69,8 @@
     "Hdecay": {
         "app_name": "Hdecay", 
         "dependencies": [], 
+        "base_url": "http://people.web.psi.ch/spira/hdecay/",
+        "tar_file": "hdecay.tar.gz",
         "installer": "hdecay.sh",
         "versions": {
             "5.0": {

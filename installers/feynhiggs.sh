@@ -4,16 +4,15 @@
 # and the locations to install and source
 NAME=$1
 VERSION=$2
-DEST_DIR=$3
-SRC_DIR=$4
+TAR_FILE=$3
+DEST_DIR=$4
+SRC_DIR=$5
 
 echo "Installing $NAME version $VERSION"
 
 export PATH=/usr/local/bin:$PATH
 
-BASE_URL=http://wwwth.mpp.mpg.de/members/heinemey/feynhiggs/newversion
 PACKAGE=$NAME-$VERSION
-TAR_FILE=$NAME-$VERSION.tar.gz
 
 mkdir -p $SRC_DIR
 
@@ -25,8 +24,8 @@ InstallFeynHiggs:
 	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
-	@echo "donwloading package from $BASE_URL"
-	curl "$BASE_URL/$TAR_FILE" | tar -xzf - -C $SRC_DIR
+	@echo "Unpacking package at $TAR_FILE"
+	tar -xzf $TAR_FILE -C $SRC_DIR
 	@echo "compiling"
 	cd $SRC_DIR/$PACKAGE && \\
 	./configure --prefix=$DEST_DIR && \\
@@ -47,12 +46,13 @@ else
 	ln -s $DEST_DIR $PREFIX/$NAME
 fi
 
+st=0
 
-echo "export PATH=$PREFIX/$NAME/bin:\$PATH" > /etc/profile.d/z$NAME.sh
-echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$NAME.sh
-echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh
-echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh
+echo "export PATH=$PREFIX/$NAME/bin:\$PATH" > /etc/profile.d/z$NAME.sh || st=1
+echo "export LD_LIBRARY_PATH=$PREFIX/$NAME/lib64:\$LD_LIBRARY_PATH" >> /etc/profile.d/z$NAME.sh || st=1
+echo "setenv PATH $PREFIX/$NAME/bin:\${PATH}" > /etc/profile.d/z$NAME.csh || st=1
+echo "setenv LD_LIBRARY_PATH $PREFIX/$NAME/lib64:\${LD_LIBRARY_PATH}" >> /etc/profile.d/z$NAME.csh || st=1
 
-echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd
+echo "* $NAME v $VERSION installed at $DEST_DIR" >> /etc/motd || st=1
 
-exit 0
+exit $st 
