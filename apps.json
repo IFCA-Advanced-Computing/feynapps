@@ -36,6 +36,7 @@
     "FormCalc": {
         "app_name": "FormCalc", 
         "dependencies": [
+            "FeynHiggs"
         ], 
         "installer": "feyntools.sh",
         "base_url": "http://www.feynarts.de/formcalc/",
