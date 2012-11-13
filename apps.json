@@ -78,6 +78,17 @@
                 "app_version": "5.0" 
             }
         }
+    },
+    "HiggsBounds": {
+        "app_name": "HiggsBounds", 
+        "dependencies": [], 
+        "base_url": "http://www.hepforge.org/archive/higgsbounds/",
+        "installer": "hbounds.sh",
+        "versions": {
+            "3.8.0": {
+                "app_version": "3.8.0" 
+            }
+        }
     }
 }
 
