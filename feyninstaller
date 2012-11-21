@@ -81,7 +81,7 @@ def execute_install(app, config):
             return True
     except KeyError, e:
         logging.error('Invalid application data %s' % e)
-    except IOError, e:
+    except (IOError, OSError), e:
         logging.error("Error trying to create script %s" % e)
     return False
 
