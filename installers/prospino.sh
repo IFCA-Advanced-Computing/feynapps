@@ -21,7 +21,7 @@ echo "Configure and make log at $logfile"
 
 make -f - << EOF > $logfile 2>&1
 InstallProspino:
- 	@echo "cleaning up"
+	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
 	@echo "Unpacking package at $TAR_FILE"
