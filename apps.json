@@ -6,9 +6,9 @@
         "base_url": "http://www.thphys.uni-heidelberg.de/~plehn/includes/prospino/",
         "tar_file": "on_the_web_9_23_12.tar.gz",
         "versions": {
-        "x": {
-            "app_version": "x"
-             }
+            "9_23_12": {
+                "app_version": "9_23_12"
+            }
         }
     },
     "FeynArts": {
