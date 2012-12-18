@@ -20,30 +20,29 @@ logfile=$SRC_DIR/$NAME-$VERSION-make.log
 echo "Configure and make log at $logfile"
 
 make -f - << EOF > $logfile 2>&1
-InstallFeynHiggs:
-	@echo "cleaning up"
+InstallProspino:
+ 	@echo "cleaning up"
 	rm -rf $SRC_DIR/$PACKAGE
 	rm -rf $DEST_DIR
 	@echo "Unpacking package at $TAR_FILE"
 	tar -xzf $TAR_FILE -C $SRC_DIR
+	mv $SRC_DIR/on_the_web_$VERSION $DEST_DIR
 	@echo "compiling"
-	cd $SRC_DIR/$PACKAGE && \\
-	./configure --prefix=$DEST_DIR && \\
-	make && \\
-	make install
+	cd $DEST_DIR && \\
+	make 
 	@echo "done."
 EOF
 if [ $? -ne 0 ] ; then
-	echo "Installation error, check $logfile"
-	exit 1
+    echo "Installation error, check $logfile"
+    exit 1
 fi
 
 PREFIX=`dirname $DEST_DIR`
 
 if [ -L $PREFIX/$NAME ] ; then
-	echo "Not changing the current link to $NAME in $PREFIX!"
+    echo "Not changing the current link to $NAME in $PREFIX!"
 else
-	ln -s $DEST_DIR $PREFIX/$NAME
+    ln -s $DEST_DIR $PREFIX/$NAME
 fi
 
 st=0
