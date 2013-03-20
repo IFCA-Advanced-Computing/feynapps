@@ -29,7 +29,7 @@ InstallHdecay:
 	tar -xzf $TAR_FILE -C $DEST_DIR
 	@echo "compiling"
 	cd $DEST_DIR && \\
-	make FC=gfortran
+	make FC=gfortran FFLAGS=
 	@echo "done."
 EOF
 if [ $? -ne 0 ] ; then

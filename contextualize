@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# simple wrapper for feyninstaller boot
+#
+
+APPS_CONF=`mktemp`
+cat - > $APPS_CONF 
+
+MY_PATH=`dirname $0`
+
+$MY_PATH/feyninstaller -c $APPS_CONF boot
